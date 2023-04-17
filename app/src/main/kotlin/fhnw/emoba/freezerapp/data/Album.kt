@@ -11,6 +11,7 @@ class Album(json: JSONObject) {
     val title: String = json.getString("title")
     val cover_small = json.getString("cover_small")
     val tracklist = json.getString("tracklist")
+    val artist = json.getJSONObject("artist").getString("name")
     var imageBitmapAlbum by mutableStateOf(Bitmap.createBitmap(30,30, Bitmap.Config.ALPHA_8).asImageBitmap())
 
 }

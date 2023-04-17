@@ -7,14 +7,6 @@ import org.junit.Test
 
 import org.junit.Assert.*
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- *
- *  ACHTUNG: Auf Android arbeiten wir (noch) mit JUNIT 4
- */
-
 class FreezerModelTest {
 
     private val singleSongAsString = """
@@ -31,10 +23,6 @@ class FreezerModelTest {
     """.trimIndent()
     val songAsJSON = JSONObject(singleSongAsString)
 
-    //when
-    val song = Song(songAsJSON)
-
-
     @Test
     fun startPlayerTest() {
 
@@ -46,7 +34,7 @@ class FreezerModelTest {
 
         //then
         assertTrue(song.isPlaying)
-        assertFalse(FreezerModel.playerIsReady)
+        assertFalse(FreezerModel.isPlayerReady)
     }
 
 
@@ -60,7 +48,7 @@ class FreezerModelTest {
 
         //then
         assertFalse(song.isPlaying)
-        assertTrue(FreezerModel.playerIsReady)
+        assertTrue(FreezerModel.isPlayerReady)
     }
 
     @Test
@@ -69,7 +57,7 @@ class FreezerModelTest {
         FreezerModel.fromStart()
 
         //then
-        assertFalse(FreezerModel.playerIsReady)
+        assertFalse(FreezerModel.isPlayerReady)
     }
 
     @Test
@@ -104,6 +92,7 @@ class FreezerModelTest {
         //then
         assertEquals("5 m 25 s", FreezerModel.convertSecondsToMinutes(song))
     }
+
 
 
 }

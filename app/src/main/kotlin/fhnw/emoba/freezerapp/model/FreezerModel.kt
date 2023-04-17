@@ -25,22 +25,20 @@ object FreezerModel {
     var darkTheme by mutableStateOf(false)
 
     var isLoading by mutableStateOf(false)
-    var playerIsReady by mutableStateOf(true)
+    var isPlayerReady by mutableStateOf(true)
     var isListView by mutableStateOf(false)
-
 
     var filter by mutableStateOf("")
     var currentSongList: List<Song> by mutableStateOf(emptyList())
     var currentAlbumList: List<Album> by mutableStateOf(emptyList())
     var currentRadioList: List<Radio> by mutableStateOf(emptyList())
     var favoriteList: List<Song> by mutableStateOf(emptyList())
-
     var currentAlbum: Album? by mutableStateOf(null)
     var currentAlbumSonglist: List<AlbumSong> by mutableStateOf(emptyList())
     var currentRadioSonglist: List<Song> by mutableStateOf(emptyList())
 
     private val player = MediaPlayer().apply {
-        setOnCompletionListener { playerIsReady = true }
+        setOnCompletionListener { isPlayerReady = true }
         setAudioAttributes(
             AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
         )
@@ -55,26 +53,68 @@ object FreezerModel {
 
     fun startPlayer(song: Song) {
         song.isPlaying = true
-        playerIsReady = false
+        isPlayerReady = false
         try {
             player.reset()
             player.setDataSource(song.preview)
             player.prepareAsync()
         } catch (e: Exception) {
-            playerIsReady = true
+            isPlayerReady = true
         }
     }
 
     fun pausePlayer(song: Song) {
         song.isPlaying = false
         player.pause()
-        playerIsReady = true
+        isPlayerReady = true
     }
 
     fun fromStart() {
         player.seekTo(0)
         player.start()
-        playerIsReady = false
+        isPlayerReady = false
+    }
+
+    fun playNextSong(song: Song) {
+        pausePlayer(song)
+        when (currentScreen) {
+            Screen.SONGS -> {
+                if (currentSongList.isNotEmpty()) {
+                    if (song == currentSongList.last()) {
+                        fromStart()
+                        song.isPlaying = true
+                    } else {
+                        val test = currentSongList.indexOf(song)
+                        startPlayer(currentSongList[test + 1])
+                    }
+                }
+            }
+            Screen.RADIO -> {
+                if (currentRadioSonglist.isNotEmpty()) {
+                    if (song == currentRadioSonglist.last()) {
+                        fromStart()
+                        song.isPlaying = true
+                    } else {
+                        val test = currentRadioSonglist.indexOf(song)
+                        startPlayer(currentRadioSonglist[test + 1])
+                    }
+                }
+            }
+            Screen.HITS -> {
+                if (favoriteList.isNotEmpty()) {
+                    if (song == favoriteList.last()) {
+                        fromStart()
+                        song.isPlaying = true
+                    } else {
+                        val test = favoriteList.indexOf(song)
+                        startPlayer(favoriteList[test + 1])
+                    }
+                }
+            }
+            else -> {
+                // nothing
+            }
+        }
     }
 
     fun launchSearch() {

@@ -11,7 +11,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import fhnw.emoba.freezerapp.model.FreezerModel
-import fhnw.emoba.freezerapp.model.Screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -21,22 +20,19 @@ import fhnw.emoba.modules.module04.beers_solution.ui.theme.MaterialAppTheme
 
 @Composable
 fun HitsScreen(model: FreezerModel) {
-    Preview(model = model, screen = Screen.HITS)
+    Body(model = model)
 }
 
-
 @Composable
-private fun Preview(
-    model: FreezerModel, screen: Screen
+private fun Body(
+    model: FreezerModel
 ) {
     with(model) {
         with(model) {
-            // my material theme
             MaterialAppTheme(
                 darkTheme
             ) {
                 if (favoriteList.isEmpty()) {
-
                     Card {
                         Box(
                             modifier = Modifier
@@ -46,14 +42,12 @@ private fun Preview(
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
-                                // painterResource(successInfo.successInfoImageId)
                                 painterResource(R.drawable.background),
                                 contentDescription = "",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(5.dp))
-
                             )
                             Text(
                                 text = "Welcome!",
@@ -61,8 +55,6 @@ private fun Preview(
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
-
-
                     }
                     Divider()
                 } else {

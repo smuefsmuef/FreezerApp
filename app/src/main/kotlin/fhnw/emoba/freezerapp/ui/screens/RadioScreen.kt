@@ -10,7 +10,6 @@ import fhnw.emoba.freezerapp.model.Screen
 fun RadioScreen(model: FreezerModel) {
     DefaultScreen(model = model, screen = Screen.RADIO)
 }
-
 @Preview(device = Devices.PIXEL_4)
 @Composable
 private fun ScreenPreview() {

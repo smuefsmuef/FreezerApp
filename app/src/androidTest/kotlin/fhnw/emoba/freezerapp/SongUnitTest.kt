@@ -27,7 +27,9 @@ class SongUnitTest {
             }
     """.trimIndent()
 
-    var imageBitmapTest by mutableStateOf(Bitmap.createBitmap(30,30,Bitmap.Config.ALPHA_8).asImageBitmap())
+    var imageBitmapTest by mutableStateOf(
+        Bitmap.createBitmap(30, 30, Bitmap.Config.ALPHA_8).asImageBitmap()
+    )
 
     @Test
     fun testConstructor() {

@@ -8,7 +8,6 @@ import fhnw.emoba.freezerapp.model.FreezerModel
 import fhnw.emoba.freezerapp.ui.AppUI
 import fhnw.emoba.freezerapp.ui.screens.AlbumsScreen
 
-
 object FreezerApp : EmobaApp {
 
     private lateinit var model: FreezerModel
@@ -16,7 +15,6 @@ object FreezerApp : EmobaApp {
     override fun initialize(activity: ComponentActivity) {
         model = FreezerModel
     }
-
     @Composable
     override fun CreateUI() {
         AppUI(FreezerModel)

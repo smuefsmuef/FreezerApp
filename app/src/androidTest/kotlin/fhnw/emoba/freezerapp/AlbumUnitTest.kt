@@ -13,8 +13,10 @@ class AlbumUnitTest {
               "id": "1234",
               "title": "It's a bloody sunday",
               "tracklist": "https://test.url",        
-              "cover_small": "https://test.url.jpg"
-                      
+              "cover_small": "https://test.url.jpg",
+              "artist": {
+              "name": "Eminem"
+              }  
             }
     """.trimIndent()
 
@@ -32,6 +34,7 @@ class AlbumUnitTest {
             assertEquals("It's a bloody sunday", title)
             assertEquals("https://test.url", tracklist)
             assertEquals("https://test.url.jpg", cover_small)
+            assertEquals("Eminem", artist)
         }
     }
 

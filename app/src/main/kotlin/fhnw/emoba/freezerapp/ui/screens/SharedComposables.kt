@@ -39,7 +39,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -47,7 +46,8 @@ import fhnw.emoba.freezerapp.model.FreezerModel.convertSecondsToMinutes
 import fhnw.emoba.freezerapp.model.FreezerModel.fromStart
 import fhnw.emoba.freezerapp.model.FreezerModel.handleFavoriteList
 import fhnw.emoba.freezerapp.model.FreezerModel.pausePlayer
-import fhnw.emoba.freezerapp.model.FreezerModel.playerIsReady
+import fhnw.emoba.freezerapp.model.FreezerModel.playNextSong
+import fhnw.emoba.freezerapp.model.FreezerModel.isPlayerReady
 import fhnw.emoba.freezerapp.model.FreezerModel.radioSongListSearch
 import fhnw.emoba.freezerapp.model.FreezerModel.songListSearch
 import fhnw.emoba.freezerapp.model.FreezerModel.startPlayer
@@ -89,20 +89,19 @@ fun DefaultBody(screen: Screen, paddingValues: PaddingValues, model: FreezerMode
             bottom.linkTo(footer.top, 5.dp)
             width = Dimension.fillToConstraints
             height = Dimension.fillToConstraints
-        }, paddingValues)
+        })
         Footer(model, Modifier.constrainAs(footer) {
             bottom.linkTo(parent.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
             width = Dimension.fillToConstraints
         })
-
     }
 }
 
 @Composable
 private fun SearchResults(
-    screen: Screen, model: FreezerModel, modifier: Modifier, paddingValues: PaddingValues
+    screen: Screen, model: FreezerModel, modifier: Modifier
 ) {
     with(model) {
         Box(
@@ -114,7 +113,7 @@ private fun SearchResults(
 
                 if (currentSongList.isEmpty() && currentAlbumList.isEmpty() && currentRadioList.isEmpty()) {
                     Text(
-                        text = "Nix gefunden", style = MaterialTheme.typography.titleSmall
+                        text = "no results", style = MaterialTheme.typography.titleSmall
                     )
                 } else {
                     if (screen == Screen.SONGS) {
@@ -187,10 +186,12 @@ fun SongListItem(song: Song) {
                                     PlayerButtons(song)
                                 }
                             }
-                            IconButton(modifier = Modifier.fillMaxWidth(), onClick = { handleFavoriteList(song) }) {
+                            IconButton(modifier = Modifier.fillMaxWidth(),
+                                onClick = { handleFavoriteList(song) }) {
                                 if (isFavorite) {
                                     Icon(
                                         imageVector = Icons.Filled.Favorite,
+                                        tint = Color.Blue,
                                         contentDescription = "favorite"
                                     )
                                 } else {
@@ -205,10 +206,7 @@ fun SongListItem(song: Song) {
                 },
                 leadingContent = {
                     SongImage(song)
-                },
-                modifier = Modifier.clickable { }
-
-            )
+                })
             Divider()
         }
     }
@@ -232,7 +230,7 @@ private fun AlbumListItem(album: Album) {
     with(album) {
         Column {
             ListItem(headlineText = { Text(title) },
-                overlineText = { Text(album.id.toString()) },
+                overlineText = { Text(artist) },
                 leadingContent = {
                     AlbumImage(album)
                 },
@@ -358,7 +356,7 @@ private fun PlayerButtons(song: Song) {
         Box(
             modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
-            if (!playerIsReady && song.isPlaying) {
+            if (!isPlayerReady && song.isPlaying) {
                 PlayFromStartButton(
                     song,
                     Modifier
@@ -368,6 +366,16 @@ private fun PlayerButtons(song: Song) {
                 )
             }
             PlayPauseButton(song, Modifier.align(Alignment.Center))
+            if (!isPlayerReady && song.isPlaying) {
+                PlayNextButton(
+                    song,
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .width(30.dp)
+                        .height(30.dp)
+                )
+            }
+
         }
     }
 }
@@ -376,7 +384,7 @@ private fun PlayerButtons(song: Song) {
 private fun PlayPauseButton(song: Song, modifier: Modifier) {
     with(song) {
         val enabled = true
-        if (playerIsReady) {
+        if (isPlayerReady) {
             IconButton(
                 onClick = { startPlayer(song) }, modifier = Modifier
                     .background(
@@ -390,7 +398,7 @@ private fun PlayPauseButton(song: Song, modifier: Modifier) {
                 Icon(
                     Icons.Filled.PlayArrow,
                     "",
-                    tint = if (enabled) Color.Black else Color.LightGray,
+                    tint = if (enabled) Color.Black else Color.Gray,
                     modifier = Modifier
                         .size(30.dp)
                         .then(modifier)
@@ -400,19 +408,12 @@ private fun PlayPauseButton(song: Song, modifier: Modifier) {
             IconButton(
                 onClick = { pausePlayer(song) },
                 modifier = Modifier
-                    .background(Color.LightGray, shape = CircleShape)
+                    .background(Color.Green, shape = CircleShape)
                     .size(30.dp)
                     .then(modifier)
             ) {
                 Icon(Icons.Filled.Pause, "", modifier = Modifier.size(30.dp))
             }
-        } else {
-            Icon(
-                Icons.Outlined.MusicNote,
-                "",
-                modifier = Modifier.size(30.dp),
-                tint = Color.LightGray
-            )
         }
     }
 }
@@ -422,6 +423,15 @@ private fun PlayFromStartButton(song: Song, modifier: Modifier) {
     with(song) {
         IconButton(onClick = { fromStart() }, modifier = modifier) {
             Icon(Icons.Filled.SkipPrevious, "Back", modifier = Modifier.size(30.dp))
+        }
+    }
+}
+
+@Composable
+private fun PlayNextButton(song: Song, modifier: Modifier) {
+    with(song) {
+        IconButton(onClick = { playNextSong(song) }, modifier = modifier) {
+            Icon(Icons.Filled.SkipNext, "Next", modifier = Modifier.size(30.dp))
         }
     }
 }

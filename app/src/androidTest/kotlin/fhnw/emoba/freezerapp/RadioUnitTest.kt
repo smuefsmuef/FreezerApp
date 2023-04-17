@@ -18,7 +18,7 @@ class RadioUnitTest {
     """.trimIndent()
 
     @Test
-    fun testConstructor(){
+    fun testConstructor() {
         //given
         val radioAsJSON = JSONObject(radioAsString)
 

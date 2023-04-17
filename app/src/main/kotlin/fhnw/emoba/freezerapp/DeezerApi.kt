@@ -7,13 +7,13 @@ import Song
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import fhnw.emoba.freezerapp.model.Screen
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
-import java.io.InputStream
+import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
+import java.net.MalformedURLException
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 
@@ -26,23 +26,30 @@ class DeezerApi {
             val url = URL("https://api.deezer.com/search/$searchType?q=$term")
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
+            try {
+                val responseCode = connection.responseCode
 
-            val responseCode = connection.responseCode
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    val inputStream = BufferedReader(InputStreamReader(connection.inputStream))
+                    val response = StringBuffer()
 
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
-                val inputStream = BufferedReader(InputStreamReader(connection.inputStream))
-                val response = StringBuffer()
+                    var inputLine: String?
+                    while (inputStream.readLine().also { inputLine = it } != null) {
+                        response.append(inputLine)
+                    }
+                    inputStream.close()
 
-                var inputLine: String?
-                while (inputStream.readLine().also { inputLine = it } != null) {
-                    response.append(inputLine)
+                    val json = JSONObject(response.toString())
+                    return json.getJSONArray("data")
+                } else {
+                    throw Exception("Deezer API: HTTP error code $responseCode")
                 }
-                inputStream.close()
-
-                val json = JSONObject(response.toString())
-                return json.getJSONArray("data")
-            } else {
-                throw Exception("Failed to load album from Deezer API: HTTP error code $responseCode")
+            } catch (e: MalformedURLException) {
+                throw IllegalArgumentException("Invalid URL: $url", e)
+            } catch (e: IOException) {
+                throw IOException("Failed to connect to Deezer API: ${e.message}.", e)
+            } finally {
+                connection.disconnect()
             }
         }
 
@@ -77,22 +84,29 @@ class DeezerApi {
             val url = URL("https://api.deezer.com/$searchType/${id}/tracks")
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
+            try {
+                val responseCode = connection.responseCode
 
-            val responseCode = connection.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream = BufferedReader(InputStreamReader(connection.inputStream))
+                    val response = StringBuffer()
 
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = BufferedReader(InputStreamReader(connection.inputStream))
-                val response = StringBuffer()
-
-                var inputLine: String?
-                while (inputStream.readLine().also { inputLine = it } != null) {
-                    response.append(inputLine)
+                    var inputLine: String?
+                    while (inputStream.readLine().also { inputLine = it } != null) {
+                        response.append(inputLine)
+                    }
+                    inputStream.close()
+                    val json = JSONObject(response.toString())
+                    return json.getJSONArray("data")
+                } else {
+                    throw Exception("Failed to load album from Deezer API: HTTP error code $responseCode")
                 }
-                inputStream.close()
-                val json = JSONObject(response.toString())
-                return json.getJSONArray("data")
-            } else {
-                throw Exception("Failed to load album from Deezer API: HTTP error code $responseCode")
+            } catch (e: MalformedURLException) {
+                throw IllegalArgumentException("Invalid URL: $url", e)
+            } catch (e: IOException) {
+                throw IOException("Failed to connect to Deezer API: ${e.message}.", e)
+            } finally {
+                connection.disconnect()
             }
         }
 
@@ -123,16 +137,16 @@ class DeezerApi {
                 val allBytes = inputStream.readBytes()
                 inputStream.close()
 
-                return BitmapFactory.decodeByteArray(
-                    allBytes, 0, allBytes.size
-                ).asImageBitmap()
-
-
+                val bitmap = BitmapFactory.decodeByteArray(allBytes, 0, allBytes.size)
+                if (bitmap != null) {
+                    return bitmap.asImageBitmap()
+                } else {
+                    throw Exception("Failed to load image from $urli")
+                }
             } catch (e: Exception) {
                 return ImageBitmap(3, 7)
             }
         }
-
 
     }
 }

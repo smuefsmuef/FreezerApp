@@ -4,18 +4,10 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,7 +18,6 @@ import fhnw.emoba.freezerapp.model.Screen
 import fhnw.emoba.freezerapp.ui.screens.*
 import fhnw.emoba.modules.module04.beers_solution.ui.theme.MaterialAppTheme
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppUI(model: FreezerModel) {
@@ -34,29 +25,26 @@ fun AppUI(model: FreezerModel) {
         MaterialAppTheme(
             darkTheme
         ) {
-        Scaffold(
-                topBar = { Bar(model) },
+            Scaffold(
+                topBar = { Bar() },
                 content = { padding ->
                     Body(model, padding)
                 },
-                floatingActionButton = {FAB(model)},
-
-                )
-
+                floatingActionButton = { FAB(model) },
+            )
         }
     }
 }
 
 @Composable
-private fun Bar(model: FreezerModel) {
+private fun Bar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .height(40.dp)
             .background(Color.Transparent),
         horizontalArrangement = Arrangement.Center,
     ) {
-
         Image(painterResource(R.drawable.deezerlogo), FreezerModel.title)
     }
 }
@@ -64,19 +52,12 @@ private fun Bar(model: FreezerModel) {
 @Composable
 private fun Body(model: FreezerModel, padding: PaddingValues) {
     with(model) {
-
         Column(modifier = Modifier.padding(padding)) {
             TabRow(selectedTabIndex = currentScreen.ordinal) {
-
-
                 for (tab in Screen.values()) {
-                    if(tab.mainTab){
-                        Tab(text = { Text(tab.title) },
-                            selected = tab == currentScreen,
-                            onClick = { currentScreen = tab }
-                        )
-                    }
-
+                    Tab(text = { Text(tab.title) },
+                        selected = tab == currentScreen,
+                        onClick = { currentScreen = tab })
                 }
             }
             ContentBox(model = model)
@@ -100,7 +81,6 @@ private fun ContentBox(model: FreezerModel) {
             Screen.RADIO -> {
                 RadioScreen(model)
             }
-
         }
     }
 }

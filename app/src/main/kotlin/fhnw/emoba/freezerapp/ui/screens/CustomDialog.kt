@@ -26,7 +26,7 @@ fun CustomDialog(setShowDialog: (Boolean) -> Unit, screen: Screen, model: Freeze
         MaterialAppTheme(
             darkTheme
         ) {
-            Dialog(onDismissRequest = { setShowDialog(false) }) {
+            Dialog(onDismissRequest = { setShowDialog(false)  }) {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                 ) {
